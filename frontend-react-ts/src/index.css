@@ -1,0 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+@import "tailwindcss";
+
+@theme {
+    --font-nunito: 'Nunito Sans', 'sans-serif';
+    --color-green: #198754;
+    --color-border: #C8C8C8;
+    --color-font-color: #545454;
+    --color-bg: #F6F8FA;
+}
