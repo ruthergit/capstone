@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage.tsx";
+import { NotFoundPage } from "./pages/NotFoundPage.tsx";
 
 import AdminLayout from "./layouts/AdminLayout.tsx";
 import AdminDashboard from "./pages/admin/Dashboard.tsx";
@@ -28,46 +29,63 @@ import DeanDashboard from "./pages/dean/Dashboard.tsx";
 import DeanSchoolEvents from "./pages/dean/SchoolEvents.tsx";
 
 import FacultyLayout from "./layouts/FacultyLayout.tsx";
+import FacultyDashboard from "./pages/faculty/Dashboard.tsx";
+
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<LoginPage />} />
 
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="document" element={<Documents />} />
-        <Route path="departments" element={<Departments />} />
-        <Route path="student-support" element={<AdminStudentSupport />} />
-        <Route path="school-events" element={<AdminSchoolEvents />} />
-        <Route path="chats" element={<Chats />} />
+      <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="document" element={<Documents />} />
+          <Route path="departments" element={<Departments />} />
+          <Route path="student-support" element={<AdminStudentSupport />} />
+          <Route path="school-events" element={<AdminSchoolEvents />} />
+          <Route path="chats" element={<Chats />} />
+        </Route>
       </Route>
 
-      <Route path="/student" element={<StudentLayout />}>
-        <Route index element={<StudentDashboard />} />
-        <Route path="student-support" element={<StudentSupport />} />
-        <Route path="school-events" element={<SchoolEvents />} />
+      <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
+        <Route path="/student" element={<StudentLayout />}>
+          <Route index element={<StudentDashboard />} />
+          <Route path="student-support" element={<StudentSupport />} />
+          <Route path="school-events" element={<SchoolEvents />} />
+        </Route>
       </Route>
 
-      <Route path="/organization" element={<StudentOrgLayout />}>
-        <Route index element={<StudentOrgDashboard />} />
-        <Route path="school-events" element={<StudentOrgSchoolEvents />} />
-        <Route path="chats" element={<StudentOrgChats />} />
+      <Route element={<ProtectedRoute allowedRoles={["student_org"]} />}>
+        <Route path="/organization" element={<StudentOrgLayout />}>
+          <Route index element={<StudentOrgDashboard />} />
+          <Route path="school-events" element={<StudentOrgSchoolEvents />} />
+          <Route path="chats" element={<StudentOrgChats />} />
+        </Route>
       </Route>
 
-      <Route path="/adviser" element={<AdviserLayout />}>
-        <Route index element={<AdviserDashboard/>}/>
-        <Route path="school-events" element={<AdviserSchoolEvents />} />
+      <Route element={<ProtectedRoute allowedRoles={["org_advisor"]} />}>
+        <Route path="/adviser" element={<AdviserLayout />}>
+          <Route index element={<AdviserDashboard />} />
+          <Route path="school-events" element={<AdviserSchoolEvents />} />
+        </Route>
       </Route>
 
-      <Route path="/dean" element={<DeanLayout />}>
-        <Route index element={<DeanDashboard/>}/>
-        <Route path="school-events" element={<DeanSchoolEvents />} />
+      <Route element={<ProtectedRoute allowedRoles={["dean"]} />}>
+        <Route path="/dean" element={<DeanLayout />}>
+          <Route index element={<DeanDashboard />} />
+          <Route path="school-events" element={<DeanSchoolEvents />} />
+        </Route>
       </Route>
 
+      <Route element={<ProtectedRoute allowedRoles={["faculty"]} />}>
+        <Route path="/faculty" element={<FacultyLayout />}>
+          <Route index element={<FacultyDashboard />} />
+        </Route>
+      </Route>
 
-
-      <Route path="/faculty" element={<FacultyLayout />}></Route>
+      <Route path="/404" element={<NotFoundPage />} />
     </Routes>
   );
 };

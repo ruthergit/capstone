@@ -4,13 +4,12 @@ import Dashboard from "../../assets/images/component-img/Dashboard-Icon.svg?reac
 import Calendar from "../../assets/images/component-img/Calendar-icon.svg?react";
 import Drop from "../../assets/images/component-img/Drop-icon.svg?react";
 import Profile from "../../assets/images/component-img/Profile-icon.svg?react";
-import Chats from "../../assets/images/component-img/Chats-icon.svg?react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuthTokenStore } from "../../store/useAuthTokenStore";
 import { useUserStore } from "../../store/useUserStore";
 import { useState } from "react";
 
-const StudentNavbar = () => {
+const FacultyNavbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { clearToken } = useAuthTokenStore();
@@ -43,19 +42,9 @@ const StudentNavbar = () => {
       </div>
       <div className="flex-1">
         <ul className="flex flex-col px-5 py-6 gap-3">
-          <NavLink to="/organization" end className={linkClass}>
-            <Dashboard className={`w-4.5 ${iconFilter("/organization")}`} />
+          <NavLink to="/faculty" end className={linkClass}>
+            <Dashboard className={`w-4.5 ${iconFilter("/faculty")}`} />
             <p>Dashboard</p>
-          </NavLink>
-          <NavLink to="/organization/school-events" className={linkClass}>
-            <Calendar
-              className={`w-4.5 ${iconFilter("/organization/school-events")}`}
-            />
-            <p>School Events</p>
-          </NavLink>
-          <NavLink to="/organization/chats" className={linkClass}>
-            <Chats className={`w-4.5 ${iconFilter("/organization/chats")}`} />
-            <p>Chats</p>
           </NavLink>
         </ul>
       </div>
@@ -84,4 +73,4 @@ const StudentNavbar = () => {
   );
 };
 
-export default StudentNavbar;
+export default FacultyNavbar;

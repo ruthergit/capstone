@@ -1,22 +1,39 @@
 import header from "../../assets/images/pnc-stuff/pnc-header.png";
 import menu from "../../assets/images/pnc-stuff/menu.png";
-import Dashboard from '../../assets/images/component-img/Dashboard-Icon.svg?react';
-import Document from '../../assets/images/component-img/Document-icon.svg?react';
-import Department from '../../assets/images/component-img/Departments-icon.svg?react';
-import Student from '../../assets/images/component-img/Student-icon.svg?react';
-import Calendar from '../../assets/images/component-img/Calendar-icon.svg?react';
-import Chats from '../../assets/images/component-img/Chats-icon.svg?react';
-import Drop from '../../assets/images/component-img/Drop-icon.svg?react';
-import Profile from '../../assets/images/component-img/Profile-icon.svg?react';
-import { NavLink, useLocation } from "react-router-dom";
-
+import Dashboard from "../../assets/images/component-img/Dashboard-Icon.svg?react";
+import Document from "../../assets/images/component-img/Document-icon.svg?react";
+import Department from "../../assets/images/component-img/Departments-icon.svg?react";
+import Student from "../../assets/images/component-img/Student-icon.svg?react";
+import Calendar from "../../assets/images/component-img/Calendar-icon.svg?react";
+import Chats from "../../assets/images/component-img/Chats-icon.svg?react";
+import Drop from "../../assets/images/component-img/Drop-icon.svg?react";
+import Profile from "../../assets/images/component-img/Profile-icon.svg?react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuthTokenStore } from "../../store/useAuthTokenStore";
+import { useUserStore } from "../../store/useUserStore";
+import { useState } from "react";
 
 const AdminNavbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { clearToken } = useAuthTokenStore();
+  const { clearUser, user } = useUserStore();
+  const [isdropDownActive, setDropDown] = useState(false);
 
-  const linkClass = ({isActive}: {isActive: boolean}) => isActive ?
-  'flex items-center gap-4 bg-green text-white p-2 rounded':
-  'flex items-center gap-4 text-font-color p-2 rounded hover:bg-green-100';
+  const handleToggle = () => {
+    setDropDown(!isdropDownActive);
+  };
+
+  const handleLogout = () => {
+    clearToken();
+    clearUser();
+    navigate("/");
+  };
+
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    isActive
+      ? "flex items-center gap-4 bg-green text-white p-2 rounded"
+      : "flex items-center gap-4 text-font-color p-2 rounded hover:bg-green-100";
 
   const iconFilter = (path: string) =>
     location.pathname === path ? "filter brightness-0 invert" : "";
@@ -30,39 +47,60 @@ const AdminNavbar = () => {
       <div className="flex-1">
         <ul className="flex flex-col px-5 py-6 gap-3">
           <NavLink to="/admin" end className={linkClass}>
-              <Dashboard className={`w-4.5 ${iconFilter("/admin")}`} /><p>Dashboard</p>
+            <Dashboard className={`w-4.5 ${iconFilter("/admin")}`} />
+            <p>Dashboard</p>
           </NavLink>
           <NavLink to="/admin/document" className={linkClass}>
-            <Document className={`w-4.5 ${iconFilter("/admin/document")}`} /><p>Documents</p>
+            <Document className={`w-4.5 ${iconFilter("/admin/document")}`} />
+            <p>Documents</p>
           </NavLink>
           <NavLink to="/admin/departments" className={linkClass}>
-            <Department className={`w-4.5 ${iconFilter("/admin/departments")}`} /><p>Departments</p>
+            <Department
+              className={`w-4.5 ${iconFilter("/admin/departments")}`}
+            />
+            <p>Departments</p>
           </NavLink>
           <NavLink to="/admin/student-support" className={linkClass}>
-            <Student className={`w-4.5 ${iconFilter("/admin/student-support")}`} /><p>Student Support</p>
+            <Student
+              className={`w-4.5 ${iconFilter("/admin/student-support")}`}
+            />
+            <p>Student Support</p>
           </NavLink>
           <NavLink to="/admin/school-events" className={linkClass}>
-            <Calendar className={`w-4.5 ${iconFilter("/admin/school-events")}`}/><p>School Events</p>
+            <Calendar
+              className={`w-4.5 ${iconFilter("/admin/school-events")}`}
+            />
+            <p>School Events</p>
           </NavLink>
           <NavLink to="/admin/chats" className={linkClass}>
-              <Chats className={`w-4.5 ${iconFilter("/admin/chats")}`} /><p>Chats</p>
+            <Chats className={`w-4.5 ${iconFilter("/admin/chats")}`} />
+            <p>Chats</p>
           </NavLink>
         </ul>
       </div>
 
-      <div className="h-20 px-6 py-6 flex justify-between items-center text-font-color">
-            <div className="flex justify-center items-center gap-3">
-              <Profile className=""/>
-              <h1>Pong Andaya</h1>
-            </div>
-            <button className="">
-              <Drop className="w-3 mr-4 rotate-180" />
-              <Drop className="w-3 mr-4 " />
-            </button>
-            
+      <div className="h-20 px-6 py-6 flex justify-between items-center text-font-color relative">
+        <div className="flex justify-center items-center gap-3">
+          <Profile className="" />
+          <h1>{user?.name}</h1>
+        </div>
+        <button onClick={handleToggle} className="hover:opacity-70 transition">
+          <Drop className="w-3 mr-4 rotate-180" />
+          <Drop className="w-3 mr-4" />
+        </button>
+        {isdropDownActive && (
+          <button
+            onClick={handleLogout}
+            className="w-fit flex rounded items-center p-3 h-5 absolute top-0 right-1 shadow-md"
+          >
+            <p className="hover:bg-red-500 hover:text-white px-1 rounded ">
+              Logout
+            </p>
+          </button>
+        )}
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default AdminNavbar
+export default AdminNavbar;

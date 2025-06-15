@@ -1,9 +1,11 @@
-import React from 'react'
+import { Outlet } from "react-router-dom"
+import FacultyNavbar from "../components/faculty/FacultyNavbar"
 
 const FacultyLayout = () => {
   return (
-    <div>
-      
+    <div className="flex box-border">
+      <FacultyNavbar/>
+      <Outlet/>
     </div>
   )
 }

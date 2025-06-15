@@ -4,7 +4,9 @@ import hide from "../assets/images/component-img/hide-password.png";
 import show from "../assets/images/component-img/view-password.png";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { login } from "../services/authService";
+import { useUserStore } from "../store/useUserStore";
+import { useAuthTokenStore } from "../store/useAuthTokenStore";
 
 const LoginPage = () => {
   const [loginId, setLoginId] = useState("");
@@ -13,51 +15,44 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const setUser = useUserStore((state) => state.setUser);
+  const setToken = useAuthTokenStore((state) => state.setToken);
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError(""); 
 
     try {
-      const response = await axios.post("/api/login", {
-        login_id: loginId,
-        password: password,
-      },{
-        withCredentials: true,
-      }
-    );
+      const { user, token } = await login(loginId, password);
 
-      const { user } = response.data;
+      setUser(user);
+      setToken(token);
 
-      // Store token in localStorage (or any state manager like Redux)
-      // localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-
-      console.log("Login success!");
-      switch (user.type){
+      switch (user.type) {
         case "admin":
           navigate("/admin");
           break;
         case "student":
-          navigate("/student")
-          break;  
+          navigate("/student");
+          break;
         case "student_org":
-          navigate("/organization") 
-          break; 
+          navigate("/organization");
+          break;
         case "org_advisor":
-          navigate("/adviser")
+          navigate("/adviser");
           break;
         case "dean":
           navigate("/dean");
           break;
         case "faculty":
-          navigate("/faculty")
+          navigate("/faculty");
           break;
         default:
           navigate("/404");
       }
-
     } catch (err: any) {
-      if (err.response && err.response.data?.errors) {
+      console.log("Login error:", err.response?.data);
+      if (err.response?.data?.errors) {
         setError(Object.values(err.response.data.errors).join(" "));
       } else {
         setError("Login failed. Please check your credentials.");
