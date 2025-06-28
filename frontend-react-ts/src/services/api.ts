@@ -6,7 +6,6 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-// Attach auth token automatically
 api.interceptors.request.use((config) => {
   const token = useAuthTokenStore.getState().authToken;
   if (token) {

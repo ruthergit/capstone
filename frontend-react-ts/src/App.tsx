@@ -6,7 +6,7 @@ import AdminLayout from "./layouts/AdminLayout.tsx";
 import AdminDashboard from "./pages/admin/Dashboard.tsx";
 import Chats from "./pages/admin/Chats.tsx";
 import Departments from "./pages/admin/Departments.tsx";
-import Documents from "./pages/admin/Documents.tsx";
+import Applicants from "./pages/admin/Applicants.tsx";
 import AdminSchoolEvents from "./pages/admin/SchoolEvents.tsx";
 import AdminStudentSupport from "./pages/admin/StudentSupport.tsx";
 
@@ -41,7 +41,7 @@ const App: React.FC = () => {
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="document" element={<Documents />} />
+          <Route path="applicants" element={<Applicants />} />
           <Route path="departments" element={<Departments />} />
           <Route path="student-support" element={<AdminStudentSupport />} />
           <Route path="school-events" element={<AdminSchoolEvents />} />

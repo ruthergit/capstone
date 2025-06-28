@@ -9,7 +9,7 @@ type LoginResponse = {
     [key: string]: any;
   };
   token: string;
-};
+};  
 
 export const login = async (
   login_id: string,

@@ -50,15 +50,15 @@ const AdminNavbar = () => {
             <Dashboard className={`w-4.5 ${iconFilter("/admin")}`} />
             <p>Dashboard</p>
           </NavLink>
-          <NavLink to="/admin/document" className={linkClass}>
-            <Document className={`w-4.5 ${iconFilter("/admin/document")}`} />
-            <p>Documents</p>
-          </NavLink>
           <NavLink to="/admin/departments" className={linkClass}>
             <Department
               className={`w-4.5 ${iconFilter("/admin/departments")}`}
             />
             <p>Departments</p>
+          </NavLink>
+          <NavLink to="/admin/applicants" className={linkClass}>
+            <Document className={`w-4.5 ${iconFilter("/admin/applicants")}`} />
+            <p>Applicants</p>
           </NavLink>
           <NavLink to="/admin/student-support" className={linkClass}>
             <Student

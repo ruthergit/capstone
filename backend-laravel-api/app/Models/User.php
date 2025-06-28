@@ -30,6 +30,11 @@ class User extends Authenticatable
         ];
     }
 
+        public function applications()
+    {
+        return $this->hasMany(Applicant::class);
+    }
+
     // === RELATIONSHIPS ===
 
     // public function student()
