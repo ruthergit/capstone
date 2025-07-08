@@ -1,11 +1,7 @@
 import { GraduationCap, Briefcase, CirclePlus } from "lucide-react";
 import Header from "../../components/Header";
 import { useState, useEffect, useRef } from "react";
-import {
-  getScholarship,
-  type Scholarship,
-  addScholarship,
-} from "../../services/scholarship";
+import { getScholarship, type Scholarship, addScholarship } from "../../services/scholarship";
 import ScholarshipDialog from "../../components/ui/ScholarshipDialog";
 
 const StudentSupport = () => {
@@ -42,12 +38,6 @@ const StudentSupport = () => {
       try {
         const data = await getScholarship();
         setScholarshipList(data);
-
-        const pdfNames = data.map((item) => {
-          const parts = item.pdf_path.split("/");
-          return parts[parts.length - 1];
-        });
-        console.log(pdfNames);
       } catch (err) {
         console.error(err);
       }

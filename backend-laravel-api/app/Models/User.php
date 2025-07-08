@@ -34,36 +34,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(Applicant::class);
     }
-
-    // === RELATIONSHIPS ===
-
-    // public function student()
-    // {
-    //     return $this->hasOne(Student::class);
-    // }
-
-    // public function faculty()
-    // {
-    //     return $this->hasOne(Faculty::class);
-    // }
-
-    // public function admin()
-    // {
-    //     return $this->hasOne(Admin::class);
-    // }
-
-    // public function dean()
-    // {
-    //     return $this->hasOne(Dean::class);
-    // }
-
-    // public function studentOrg()
-    // {
-    //     return $this->hasOne(StudentOrg::class);
-    // }
-
-    // public function orgAdvisor()
-    // {
-    //     return $this->hasOne(OrgAdvisor::class);
-    // }
 }

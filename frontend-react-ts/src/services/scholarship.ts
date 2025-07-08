@@ -8,6 +8,15 @@ export type Scholarship = {
   created_at?: string;
   updated_at?: string;
 };
+export type Applicant = {
+  id?: number;
+  user_name: string;
+  user_email: string;
+  pdf_path: string;
+  original_name: string;
+  created_at?: string;
+  updated_at?: string;
+};
 
 export const getScholarship = async () => {
   const response = await api.get<Scholarship[]>("/scholarships");
@@ -27,7 +36,6 @@ export const addScholarship = async (name: string, pdf: File) => {
   return response.data;
 };
 
-
 export const applyScholarship = async (
   id: number,
   name: string,
@@ -44,5 +52,10 @@ export const applyScholarship = async (
       "Content-Type": "multipart/form-data",
     },
   });
+  return response.data;
+};
+
+export const getApplicant = async () => {
+  const response = await api.get<Applicant[]>("/applicants");
   return response.data;
 };

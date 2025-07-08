@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Scholarship;
 use App\Models\Applicant;
-use App\Models\User;
 
 class ScholarshipController extends Controller
 {
@@ -75,5 +74,22 @@ class ScholarshipController extends Controller
         'application' => $application,
     ]);
     }
+
+    public function getApplicants($id)
+{
+    $scholarship = Scholarship::with('applicants.user')->findOrFail($id);
+
+    return response()->json([
+        'scholarship' => $scholarship->name,
+        'applicants' => $scholarship->applicants,
+    ]);
+}
+
+    public function allApplicants()
+{
+    $applicants = Applicant::with(['user', 'scholarship'])->get();
+
+    return response()->json($applicants);
+}
 
 }
