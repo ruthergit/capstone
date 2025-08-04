@@ -17,13 +17,20 @@ class AuthController extends Controller
             'login_id' => 'required|string|unique:users',
             'password' => 'required|string|confirmed',
             'type' => 'required|in:admin,student,student_org,faculty,org_advisor,dean',
+
+            // Required only if student_org
+            // New validation rules
+            'org_advisor_id' => 'nullable|exists:users,id',
+            'dean_id' => 'required_if:type,student_org,org_advisor|exists:users,id',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'login_id' => $request->login_id,
-            'password' => bcrypt($request->password), // Use bcrypt for hashing
+            'password' => bcrypt($request->password),
             'type' => $request->type,
+            'org_advisor_id' => $request->org_advisor_id ?? null,
+            'dean_id' => $request->dean_id ?? null,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -34,6 +41,7 @@ class AuthController extends Controller
             'token' => $token,
         ], 201);
     }
+
 
     // === Login ===
     public function login(Request $request)

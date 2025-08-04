@@ -38,7 +38,7 @@ const ScholarshipDialog: React.FC<ScholarshipDialogProps> = ({
   return (
     <dialog
       ref={dialogRef}
-      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded p-6 shadow-xl backdrop:bg-black/50 focus:outline-none bg-white w-full max-w-md"
+      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded p-6 shadow-xl backdrop:bg-black/50 focus:outline-none bg-white w-full max-w-md font-nunito"
     >
       <h2 className="text-xl font-bold mb-4">Add Scholarship</h2>
       <form onSubmit={handleFormSubmit} className="space-y-4">
