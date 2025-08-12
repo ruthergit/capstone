@@ -4,7 +4,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\API\ScholarshipController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -20,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Scholarship routes...
     Route::get('/scholarships', [ScholarshipController::class, 'index']);
     Route::post('/scholarships', [ScholarshipController::class, 'store']);
+    Route::post('/scholarships/{id}/approve', [ScholarshipController::class, 'approve']);
     Route::post('/scholarships/{id}/apply', [ScholarshipController::class, 'apply']);
     Route::get('/scholarships/{id}/applicants', [ScholarshipController::class, 'getApplicants']);
     Route::get('/applicants', [ScholarshipController::class, 'allApplicants']);

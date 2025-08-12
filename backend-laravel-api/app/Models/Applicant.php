@@ -15,10 +15,21 @@ class Applicant extends Model
     'submitted_at',
     'pdf_path',
     'original_name',
+    'status',
     'user_name',
     'user_email',
     ];
 
+     protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($applicant) {
+            if (!isset($applicant->status)) {
+                $applicant->status = 'pending';
+            }
+        });
+    }
 
     public function user()
     {

@@ -31,6 +31,20 @@ class ScholarshipController extends Controller
         return response()->json($scholarship, 201);
     }
 
+    public function approve(Request $request,$id)
+    {
+        try{
+            $applicant = Applicant::findOrFail($id);
+
+            $applicant->update([
+                'status' => 'approved'
+            ]);
+            return response()->json(['message' => 'Student scholarship approved']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     // 🔁 Get all scholarships
     public function index()
     {
@@ -39,57 +53,57 @@ class ScholarshipController extends Controller
 
     // 🟣 Apply to scholarship (student only)
     public function apply(Request $request, $id)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if ($user->type !== 'student') {
-        return response()->json(['message' => 'Only students can apply'], 403);
-    }
+        if ($user->type !== 'student') {
+            return response()->json(['message' => 'Only students can apply'], 403);
+        }
 
-    $request->validate([
-        'pdf' => 'required|file|mimes:pdf|max:2048',
-        'email' => 'required|email',
-        'name' => 'required|string',
-    ]);
+        $request->validate([
+            'pdf' => 'required|file|mimes:pdf|max:2048',
+            'email' => 'required|email',
+            'name' => 'required|string',
+        ]);
 
-    $scholarship = Scholarship::findOrFail($id);
+        $scholarship = Scholarship::findOrFail($id);
 
-    $file = $request->file('pdf');
-    $originalName = $file->getClientOriginalName(); 
-    $path = $file->store('applications', 'public');
+        $file = $request->file('pdf');
+        $originalName = $file->getClientOriginalName(); 
+        $path = $file->store('applications', 'public');
 
-    $application = Applicant::updateOrCreate(
-        ['user_id' => $user->id, 'scholarship_id' => $id],
-        [
-            'submitted_at' => now(),
-            'pdf_path' => $path,
-            'original_name' => $originalName,
-            'user_name' => $user->name,
-            'user_email' => $request->input('email'),
-        ]
-    );
+        $application = Applicant::updateOrCreate(
+            ['user_id' => $user->id, 'scholarship_id' => $id],
+            [
+                'submitted_at' => now(),
+                'pdf_path' => $path,
+                'original_name' => $originalName,
+                'user_name' => $user->name,
+                'user_email' => $request->input('email'),
+            ]
+        );
 
-    return response()->json([
-        'message' => 'Applied successfully',
-        'application' => $application,
-    ]);
-    }
+        return response()->json([
+            'message' => 'Applied successfully',
+            'application' => $application,
+        ]);
+        }
 
     public function getApplicants($id)
-{
-    $scholarship = Scholarship::with('applicants.user')->findOrFail($id);
+    {
+        $scholarship = Scholarship::with('applicants.user')->findOrFail($id);
 
-    return response()->json([
-        'scholarship' => $scholarship->name,
-        'applicants' => $scholarship->applicants,
-    ]);
-}
+        return response()->json([
+            'scholarship' => $scholarship->name,
+            'applicants' => $scholarship->applicants,
+        ]);
+    }
 
-    public function allApplicants()
-{
-    $applicants = Applicant::with(['user', 'scholarship'])->get();
+        public function allApplicants()
+    {
+        $applicants = Applicant::with(['user', 'scholarship'])->get();
 
-    return response()->json($applicants);
-}
+        return response()->json($applicants);
+    }
 
 }

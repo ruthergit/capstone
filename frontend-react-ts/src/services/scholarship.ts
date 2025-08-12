@@ -14,6 +14,7 @@ export type Applicant = {
   user_email: string;
   pdf_path: string;
   original_name: string;
+  status: string;
   created_at?: string;
   updated_at?: string;
 };
@@ -52,6 +53,13 @@ export const applyScholarship = async (
       "Content-Type": "multipart/form-data",
     },
   });
+  return response.data;
+};
+
+export const approveScholarship = async (
+  id:number,
+) => {
+  const response = await api.post(`/scholarships/${id}/approve`);
   return response.data;
 };
 

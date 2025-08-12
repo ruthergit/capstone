@@ -9,7 +9,7 @@ class Scholarship extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'pdf_path', 'original_name',];
+    protected $fillable = ['name', 'pdf_path', 'original_name'];
 
     public function applicants()
     {
