@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;    
 use App\Http\Controllers\API\ScholarshipController;
+use App\Http\Controllers\API\AssistantshipController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +15,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // User routes...
     Route::get('/users', [UserController::class, 'index']);
+    Route::get('/me', [UserController::class, 'me']);
     Route::post('/users/multiple', [UserController::class, 'getMultiple']);
 
     // Scholarship routes...
@@ -21,8 +23,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/scholarships', [ScholarshipController::class, 'store']);
     Route::post('/scholarships/{id}/approve', [ScholarshipController::class, 'approve']);
     Route::post('/scholarships/{id}/apply', [ScholarshipController::class, 'apply']);
-    Route::get('/scholarships/{id}/applicants', [ScholarshipController::class, 'getApplicants']);
+    Route::get('/scholarships/{id}/applicant', [ScholarshipController::class, 'getApplicant']);
     Route::get('/applicants', [ScholarshipController::class, 'allApplicants']);
+
+    // Assistantship routes...
+    Route::get('/assistantships', [AssistantshipController::class, 'index']);
+    Route::post('/assistantships', [AssistantshipController::class, 'store']);
+    Route::post('/assistantships/{id}/approve', [AssistantshipController::class, 'approve']);
+    Route::post('/assistantships/{id}/apply', [AssistantshipController::class, 'apply']);
+    Route::get('/assistantships/{id}/applicant', [AssistantshipController::class, 'getApplicant']);
+    Route::get('/assistantship-applicants', [AssistantshipController::class, 'allApplicants']);
 
     // Event creation & viewing
     Route::get('/events', [EventController::class, 'index']);

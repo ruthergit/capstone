@@ -1,14 +1,17 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\ScholarshipModel;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
+use App\Models\ScholarshipModel\Scholarship;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Applicant extends Model
+class ScholarshipApplicant extends Model
 {
     use HasFactory;
 
+    protected $table = 'scholarshipApplicants';
     protected $fillable = [
     'user_id',
     'scholarship_id',

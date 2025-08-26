@@ -5,12 +5,12 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Models\Scholarship;
-use App\Models\Applicant;
+use App\Models\ScholarshipModel\Scholarship;
+use App\Models\ScholarshipModel\ScholarshipApplicant;
 
 class ScholarshipController extends Controller
 {
-    // 🟢 Store new scholarship (admin)
+    // Store new scholarship (admin)
     public function store(Request $request)
     {
         $request->validate([
@@ -31,27 +31,28 @@ class ScholarshipController extends Controller
         return response()->json($scholarship, 201);
     }
 
-    public function approve(Request $request,$id)
+    public function approve(Request $request, $id)
     {
-        try{
-            $applicant = Applicant::findOrFail($id);
+        try {
+            $applicant = ScholarshipApplicant::findOrFail($id); // ✅ updated model
 
             $applicant->update([
                 'status' => 'approved'
             ]);
+
             return response()->json(['message' => 'Student scholarship approved']);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => $e->getMessage()], status: 500);
         }
     }
 
-    // 🔁 Get all scholarships
+    // Get all scholarships
     public function index()
     {
         return Scholarship::all();
     }
 
-    // 🟣 Apply to scholarship (student only)
+    // Apply to scholarship (student only)
     public function apply(Request $request, $id)
     {
         $user = Auth::user();
@@ -62,8 +63,6 @@ class ScholarshipController extends Controller
 
         $request->validate([
             'pdf' => 'required|file|mimes:pdf|max:2048',
-            'email' => 'required|email',
-            'name' => 'required|string',
         ]);
 
         $scholarship = Scholarship::findOrFail($id);
@@ -72,14 +71,17 @@ class ScholarshipController extends Controller
         $originalName = $file->getClientOriginalName(); 
         $path = $file->store('applications', 'public');
 
-        $application = Applicant::updateOrCreate(
-            ['user_id' => $user->id, 'scholarship_id' => $id],
+        $application = ScholarshipApplicant::updateOrCreate( // ✅ updated model
+            [
+                'user_id' => $user->id, 
+                'scholarship_id' => $id
+            ],
             [
                 'submitted_at' => now(),
                 'pdf_path' => $path,
                 'original_name' => $originalName,
                 'user_name' => $user->name,
-                'user_email' => $request->input('email'),
+                'user_email' => $user->email,
             ]
         );
 
@@ -87,23 +89,25 @@ class ScholarshipController extends Controller
             'message' => 'Applied successfully',
             'application' => $application,
         ]);
-        }
+    }
 
-    public function getApplicants($id)
+    public function getApplicant($userId)
     {
-        $scholarship = Scholarship::with('applicants.user')->findOrFail($id);
+        $applications = ScholarshipApplicant::with('scholarship')
+            ->where('user_id', $userId)
+            ->get();
 
         return response()->json([
-            'scholarship' => $scholarship->name,
-            'applicants' => $scholarship->applicants,
+            'user_id' => $userId,
+            'applications' => $applications,
         ]);
     }
 
-        public function allApplicants()
+
+    public function allApplicants()
     {
-        $applicants = Applicant::with(['user', 'scholarship'])->get();
+        $applicants = ScholarshipApplicant::with(['user', 'scholarship'])->get(); // ✅ updated model
 
         return response()->json($applicants);
     }
-
 }

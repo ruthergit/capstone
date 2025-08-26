@@ -13,6 +13,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'email',
         'login_id',
         'password',
         'type',
@@ -32,10 +33,10 @@ class User extends Authenticatable
         ];
     }
 
-    public function applications()
-    {
-        return $this->hasMany(Applicant::class);
-    }
+    // public function applications()
+    // {
+    //     return $this->hasMany(Applicant::class);
+    // }
 
     // Relationship: For student_org → org_advisor
     public function orgAdvisor()
@@ -65,17 +66,5 @@ class User extends Authenticatable
     {
         return $this->hasMany(Event::class, 'created_by');
     }
-    // Optional: For dean → all student_org (via org_advisors)
-    // public function allStudentOrgs()
-    // {
-    //     return $this->hasManyThrough(
-    //         User::class,
-    //         User::class,
-    //         'dean_id',         // Foreign key on org_advisors table
-    //         'org_advisor_id',  // Foreign key on student_orgs table
-    //         'id',              // Local key on dean
-    //         'id'               // Local key on org_advisor
-    //     )->where('users.type', 'student_org');
-    // }
 }
 
