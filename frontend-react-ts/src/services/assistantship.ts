@@ -19,7 +19,9 @@ export type AssistantshipApplicantFile = {
   file_size: number;
   created_at?: string;
   updated_at?: string;
+  file_url: string;
 };
+
 export type AssistantshipApplicant = {
   id?: number;
   user_id: number;
@@ -59,21 +61,33 @@ export const addAssistantship = async ( name: string, description: string, pdf: 
   return response.data;
 };
 
-export const applyAssistantship = async (id: number, pdf: File) => {
-    const formData = new FormData();
-    formData.append("pdf", pdf);
+export const applyAssistantship = async (id: number, files: File[]) => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append("files[]", file);
+  });
 
-    const response = await api.post(`/assistantships/${id}/apply`, formData, {
-     headers: {
+  const response = await api.post(`/assistantships/${id}/apply`, formData, {
+    headers: {
       "Content-Type": "multipart/form-data",
     },
   });
   return response.data;
-}
+};
 
-export const approveAssistantship = async (id: number) => {
-    const response = await api.post(`/assistantships/${id}/approve`);
-    return response.data;
+export const approveAssistantshipApplicant = async (id: number) => {
+  const response = await api.post(`/assistantship-applicants/${id}/approve`);
+  return response.data;
+};
+
+export const rejectAssistantshipApplicant = async (id: number) => {
+  const response = await api.post(`/assistantship-applicants/${id}/reject`);
+  return response.data;
+};
+
+export const getAssistantshipApplications = async (id: number) => {
+  const response = await api.get(`/assistantships/${id}/applicants`);
+  return response.data;
 }
 
 export const getAssistantshipApplicant = async () => {
@@ -82,6 +96,6 @@ export const getAssistantshipApplicant = async () => {
 }
 
 export const getUserAssistantshipApplications = async (userId: number) => {
-  const res = await api.get(`/assistantships/${userId}/applicant`)
+  const res = await api.get(`/assistantships/${userId}/assistantship-applications`)
   return res.data.applications;
 };

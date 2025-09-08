@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/preview-pdf/{type}/{filename}', function ($type, $filename) {
-    $allowedTypes = ['scholarships', 'assistantships']; // only allow valid folders
+    $allowedTypes = ['scholarships', 'assistantships', 'applications']; 
     
     if (!in_array($type, $allowedTypes)) {
         abort(404, 'Invalid file type.');

@@ -7,8 +7,6 @@ interface PdfPreviewLinkProps {
 }
 
 const PdfPreviewLink: React.FC<PdfPreviewLinkProps> = ({ path, name, onPreview }) => {
-  console.log("path from API:", path);
-
   return (
     <span
       onClick={() => onPreview(path)} 

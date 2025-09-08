@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Models\ScholarshipModel\ScholarshipApplicant;
+use App\Models\AssistantshipModel\AssistantshipApplicant;
 
 class AuthController extends Controller
 {
@@ -58,6 +60,21 @@ class AuthController extends Controller
                 'login_id' => ['The provided credentials are incorrect.'],
             ]);
         }
+
+        $applicantId = null;
+
+        $scholarshipApplicant = ScholarshipApplicant::where('user_id', $user->id)->first();
+        if ($scholarshipApplicant) {
+            $applicantId = $scholarshipApplicant->id;
+        }
+
+        $assistantshipApplicant = AssistantshipApplicant::where('user_id', $user->id)->first();
+        if ($assistantshipApplicant) {
+            $applicantId = $assistantshipApplicant->id;
+        }
+
+        // Attach applicant_id dynamically
+        $user->applicant_id = $applicantId;
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

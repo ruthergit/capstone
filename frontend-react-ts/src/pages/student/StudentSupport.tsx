@@ -1,7 +1,8 @@
-import { GraduationCap, Briefcase } from "lucide-react";
+import { GraduationCap, Briefcase, ArrowLeft } from "lucide-react";
 import Header from "../../components/Header";
 import { useState, useEffect, useRef } from "react";
-import { // ✅ Services (API functions + types)
+// ✅ Services (API functions + types)
+import {
   getUserScholarshipApplications,
   getScholarship,
   type Scholarship,
@@ -23,9 +24,9 @@ import { useUserStore } from "../../store/useUserStore";
 
 const StudentSupport = () => {
   /*  Global User Data ------------------- */
-  const userId = useUserStore((state) => state.user?.id); // Logged-in user ID
+  const userId = useUserStore((state) => state.user?.id);
 
-  /*  Track Applied Scholarships/Assistantships ------------------- */
+  /* Track Applications ------------------- */
   const [appliedScholarshipIds, setAppliedScholarshipIds] = useState<Set<number>>(new Set());
   const [appliedAssistantshipIds, setAppliedAssistantshipIds] = useState<Set<number>>(new Set());
 
@@ -33,9 +34,7 @@ const StudentSupport = () => {
   useEffect(() => {
     if (!userId) return;
     getUserScholarshipApplications(userId)
-      .then((apps) => {
-        setAppliedScholarshipIds(new Set(apps.map((a: any) => a.scholarship_id)));
-      })
+      .then((apps) => setAppliedScholarshipIds(new Set(apps.map((a: any) => a.scholarship_id))))
       .catch(console.error);
   }, [userId]);
 
@@ -43,71 +42,43 @@ const StudentSupport = () => {
   useEffect(() => {
     if (!userId) return;
     getUserAssistantshipApplications(userId)
-      .then((apps) => {
-        setAppliedAssistantshipIds(new Set(apps.map((a: any) => a.assistantship_id)));
-      })
+      .then((apps) => setAppliedAssistantshipIds(new Set(apps.map((a: any) => a.assistantship_id))))
       .catch(console.error);
   }, [userId]);
 
-  // Check if user already applied
   const hasAppliedScholarship = (id: number) => appliedScholarshipIds.has(id);
   const hasAppliedAssistantship = (id: number) => appliedAssistantshipIds.has(id);
 
-  /*  Page State  */
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // PDF preview dialog
-  const [isScholarshipActive, setScholarship] = useState(true); // Toggle scholarship page
-  const [isAssistantshipActive, setAssistantship] = useState(true); // Toggle assistantship page
+  /* Page State for viewing pdf's */
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const toggleScholarship = () => setScholarship(!isScholarshipActive);
-  const toggleAssistantship = () => setAssistantship(!isAssistantshipActive);
+  // Instead of 2 booleans → use 1 active type
+  const [activeType, setActiveType] = useState<"scholarship" | "assistantship" | null>(null);
 
-  /*  Fetched Data  */
+  const showScholarships = () => setActiveType("scholarship");
+  const showAssistantships = () => setActiveType("assistantship");
+  const goBack = () => setActiveType(null);
+
+  /* Data ------------------- */
   const [scholarships, setScholarshipList] = useState<Scholarship[]>([]);
   const [assistantships, setAssistantshipList] = useState<Assistantship[]>([]);
 
-  // Fetch scholarships
   useEffect(() => {
-    const fetchScholarships = async () => {
-      try {
-        const data = await getScholarship();
-        setScholarshipList(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchScholarships();
+    getScholarship().then(setScholarshipList).catch(console.error);
+    getAssistantship().then(setAssistantshipList).catch(console.error);
   }, []);
 
-  // Fetch assistantships
-  useEffect(() => {
-    const fetchAssistantships = async () => {
-      try {
-        const data = await getAssistantship();
-        setAssistantshipList(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchAssistantships();
-  }, []);
-
-  /*  Application Dialog */
+  /* Application Dialog ------------------- */
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
-  const id = useIdStore((state) => state.id); // ID of selected scholarship/assistantship
+  const id = useIdStore((state) => state.id);
   const setId = useIdStore((state) => state.setId);
 
-  // Open dialog when ID is set
-  const openDialog = () => {
-    dialogRef.current?.showModal();
-    console.log("Selected ID:", id);
-  };
+  const openDialog = () => dialogRef.current?.showModal();
 
   useEffect(() => {
-    if (isScholarshipActive) {
-      setId(null); // reset when switching
-    }
     if (id !== null) {
       openDialog();
     }
@@ -115,33 +86,59 @@ const StudentSupport = () => {
 
   // File input handling
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setSelectedFile(file);
-  };
+    const files = e.target.files;
+    if (!files) return;
 
-  const handleRemoveFile = () => setSelectedFile(null);
-  const handleCancel = () => {
-    dialogRef.current?.close();
-    setSelectedFile(null);
-  };
-
-  // Submit scholarship application
-  const handleSubmit = async (file: File) => {
-    try {
-      await applyScholarship(id!, file);
-      dialogRef.current?.close();
-      setSelectedFile(null);
-    } catch (err) {
-      console.error("Failed to apply scholarship:", err);
+    if (activeType === "scholarship") {
+      setSelectedFile(files[0]); // single
+    }
+    if (activeType === "assistantship") {
+      setSelectedFiles((prev) => [...prev, ...Array.from(files)]);
     }
   };
 
-  /* Render */
+  const handleRemoveFile = (index?: number) => {
+    if (activeType === "scholarship") {
+      setSelectedFile(null);
+    }
+    if (activeType === "assistantship" && index !== undefined) {
+      setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleCancel = () => {
+    dialogRef.current?.close();
+    setSelectedFile(null);
+    setSelectedFiles([]);
+    setId(null);
+  };
+
+  // Submit handler (shared)
+  const handleSubmit = async () => {
+    try {
+      if (activeType === "scholarship" && selectedFile) {
+        await applyScholarship(id!, selectedFile);
+        dialogRef.current?.close();
+        setSelectedFile(null);
+      }
+
+      if (activeType === "assistantship" && selectedFiles.length > 0) {
+        await applyAssistantship(id!, selectedFiles);
+        dialogRef.current?.close();
+        setSelectedFiles([]);
+      }
+    } catch (err) {
+      console.error("Submit failed:", err);
+    }
+  };
+
+  /* Render ------------------- */
   return (
     <div className="bg-bg w-full">
       <Header title="Student Support" />
 
-      {isScholarshipActive && isAssistantshipActive && (
+      {/* Selection Page */}
+      {activeType === null && (
         <div>
           <div className="text-center mt-6">
             <p className="text-gray-700 text-xl font-semibold">
@@ -149,18 +146,15 @@ const StudentSupport = () => {
             </p>
           </div>
           <div className="mx-6 my-6 flex h-2/7 gap-4 justify-center items-center">
-            {/* Scholarship Choice */}
             <div
-              onClick={toggleScholarship}
+              onClick={showScholarships}
               className="w-full flex flex-col shadow-md items-center justify-center p-8 rounded bg-white hover:bg-blue-100 cursor-pointer transition"
             >
               <GraduationCap className="w-12 h-12 text-blue-700 mb-2" />
               <h2 className="text-xl font-semibold text-blue-800">Scholarship</h2>
             </div>
-
-            {/* Assistantship Choice */}
             <div
-              onClick={toggleAssistantship}
+              onClick={showAssistantships}
               className="w-full flex flex-col shadow-md items-center justify-center p-8 rounded bg-white hover:bg-green-100 cursor-pointer transition"
             >
               <Briefcase className="w-12 h-12 text-green-700 mb-2" />
@@ -170,9 +164,9 @@ const StudentSupport = () => {
         </div>
       )}
 
-      {!isScholarshipActive && (
+      {/* Scholarship List */}
+      {activeType === "scholarship" && (
         <div className="bg-white font-nunito text-black rounded mx-6 my-6 shadow-md h-[83vh] p-6">
-          {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <GraduationCap className="w-8 h-7" />
@@ -180,9 +174,11 @@ const StudentSupport = () => {
                 Available Scholarships
               </h2>
             </div>
+            <button onClick={goBack} className="flex items-center gap-1.5 border-gray-300 rounded px-3 py-1 text-sm text-gray-700 shadow-sm hover:bg-green-50 focus:outline-none">
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </button>
           </div>
-
-          {/* Table */}
           <div className="overflow-auto h-[370px] rounded border border-gray-200">
             <table className="min-w-full text-sm text-left">
               <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
@@ -195,10 +191,7 @@ const StudentSupport = () => {
               {scholarships.map((scholarship) => (
                 <tbody key={scholarship.id} className="bg-white text-gray-800">
                   <tr className="border-t">
-                    {/* Title */}
                     <td className="px-4 py-3">{scholarship.name}</td>
-
-                    {/* PDF Link */}
                     <td className="px-4 py-3">
                       <PdfPreviewLink
                         path={scholarship.pdf_url}
@@ -206,15 +199,10 @@ const StudentSupport = () => {
                         onPreview={(url) => setPreviewUrl(url)}
                       />
                     </td>
-
-                    {/* Action Button */}
                     <td className="px-4 py-3">
                       <button
-                        key={scholarship.id}
                         disabled={hasAppliedScholarship(scholarship.id!)}
-                        onClick={() => {
-                          setId(scholarship.id!);
-                        }}
+                        onClick={() => setId(scholarship.id!)}
                         className={`inline-block px-2 py-1 text-xs focus:outline-none font-semibold rounded 
                           ${
                             hasAppliedScholarship(scholarship.id!)
@@ -235,10 +223,9 @@ const StudentSupport = () => {
         </div>
       )}
 
-      {/*  Assistantship List */}
-      {!isAssistantshipActive && (
+      {/* Assistantship List */}
+      {activeType === "assistantship" && (
         <div className="bg-white font-nunito text-black rounded mx-6 my-6 shadow-md h-[83vh] p-6">
-          {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Briefcase className="w-8 h-7" />
@@ -246,9 +233,12 @@ const StudentSupport = () => {
                 Available Assistantships
               </h2>
             </div>
+            <button onClick={goBack} className="flex items-center gap-1.5 border-gray-300 rounded px-3 py-1 text-sm text-gray-700 shadow-sm hover:bg-green-50 focus:outline-none"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </button>
           </div>
-
-          {/* Table */}
           <div className="overflow-auto h-[370px] rounded border border-gray-200">
             <table className="min-w-full text-sm text-left">
               <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
@@ -262,27 +252,19 @@ const StudentSupport = () => {
               {assistantships.map((assistantship) => (
                 <tbody key={assistantship.id} className="bg-white text-gray-800">
                   <tr className="border-t">
-                    {/* Title */}
                     <td className="px-4 py-3">{assistantship.name}</td>
-
-                    {/* Description */}
                     <td className="px-4 py-3">{assistantship.description}</td>
-
-                    {/* PDF Link */}
                     <td className="px-4 py-3">
                       <PdfPreviewLink
                         path={assistantship.pdf_url}
-                        name={assistantship.name}
+                        name={assistantship.original_name}
                         onPreview={(url) => setPreviewUrl(url)}
                       />
                     </td>
-
-                    {/* Action Button */}
                     <td className="px-4 py-3">
                       <button
-                        key={assistantship.id}
                         disabled={hasAppliedAssistantship(assistantship.id!)}
-                        // TODO: hook up assistantship application
+                        onClick={() => setId(assistantship.id!)}
                         className={`inline-block px-2 py-1 text-xs focus:outline-none font-semibold rounded 
                           ${
                             hasAppliedAssistantship(assistantship.id!)
@@ -303,15 +285,35 @@ const StudentSupport = () => {
         </div>
       )}
 
-      {/*  Reusable Dialogs */}
-      <StudentApplyDialog
-        dialogRef={dialogRef}
-        selectedFile={selectedFile}
-        handleFileChange={handleFileChange}
-        handleRemoveFile={handleRemoveFile}
-        onCancel={handleCancel}
-        onSubmit={handleSubmit}
-      />
+      {/* Reusable Dialogs */}
+      {activeType === "scholarship" && (
+        <StudentApplyDialog
+          dialogRef={dialogRef}
+          selectedFile={selectedFile}
+          handleFileChange={handleFileChange}
+          handleRemoveFile={handleRemoveFile}
+          onCancel={handleCancel}
+          onSubmit={handleSubmit}
+          title="Apply Scholarship"
+          fileLabel="Upload Scholarship Application (PDF)"
+          multiple={false}
+        />
+      )}
+
+      {activeType === "assistantship" && (
+        <StudentApplyDialog
+          dialogRef={dialogRef}
+          selectedFile={null}
+          selectedFiles={selectedFiles}
+          handleFileChange={handleFileChange}
+          handleRemoveFile={handleRemoveFile}
+          onCancel={handleCancel}
+          onSubmit={handleSubmit}
+          title="Apply Assistantship"
+          fileLabel="Upload Assistantship Files (PDFs)"
+          multiple={true}
+        />
+      )}
 
       <PdfPreviewDialog fileUrl={previewUrl} onClose={() => setPreviewUrl(null)} />
     </div>

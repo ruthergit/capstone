@@ -7,8 +7,7 @@ interface PdfPreviewDialogProps {
 
 const PdfPreviewDialog: React.FC<PdfPreviewDialogProps> = ({ fileUrl, onClose }) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
-
-  // open dialog whenever fileUrl changes
+  
   React.useEffect(() => {
     if (fileUrl) {
       dialogRef.current?.showModal();

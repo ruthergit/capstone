@@ -5,10 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Notifications\AssistantshipApproved;
 use App\Models\AssistantshipModel\Assistantship;
 use App\Models\AssistantshipModel\AssistantshipApplicant;
 use App\Models\AssistantshipModel\AssistantshipApplicantFile;
-use Illuminate\Support\Facades\Storage;
 
 class AssistantshipController extends Controller
 {
@@ -34,15 +34,40 @@ class AssistantshipController extends Controller
         return response()->json($assistantship, 201);
     }
 
-    public function approve(Request $request, $id){
-        try { // approving assistantship
+    public function approve($id)
+    {
+        try { 
             $applicant = AssistantshipApplicant::findOrFail($id);
 
             $applicant->update([
                 'status' => 'approved'
             ]);
 
-            return response()->json(['message' => 'Student assistantship approved']);
+            $assistantshipName = $applicant->assistantship->name ?? 'Assistantship';
+
+
+            $applicant->user->notify(new AssistantshipApproved($assistantshipName));
+
+            return response()->json([
+                'message' => 'Assistantship approved and user notified.'
+            ], 200);
+        } catch (\Exception $e){
+            return response()->json([
+                    'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function reject($id)
+    {
+        try{
+            $applicant = AssistantshipApplicant::findOrFail($id);
+
+            $applicant->update([
+                'status' => 'rejected'
+            ]);
+
+            return response()->json(['message' => 'Student assistantship rejected']);
         } catch (\Exception $e){
             return response()->json(['error' => $e->getMessage()], status: 500);
         }
@@ -112,5 +137,35 @@ class AssistantshipController extends Controller
         return response()->json($applicants);
     }
 
+    // Get all applicants for a specific assistantship
+    public function assistantshipApplicants($assistantshipId)
+    {
+        $assistantship = Assistantship::with(['applicants.user', 'applicants.files'])
+            ->findOrFail($assistantshipId);
+
+        return response()->json([
+            'assistantship_id' => $assistantship->id,
+            'assistantship_name' => $assistantship->name,
+            'applicants' => $assistantship->applicants->map(function ($applicant) {
+                return [
+                    'id' => $applicant->id,
+                    'user_id' => $applicant->user_id,
+                    'user_name' => $applicant->user_name,
+                    'user_email' => $applicant->user_email,
+                    'status' => $applicant->status,
+                    'submitted_at' => $applicant->submitted_at,
+                    'files' => $applicant->files->map(function ($file) {
+                        return [
+                            'id' => $file->id,
+                            'original_name' => $file->original_name,
+                            'file_type' => $file->file_type,
+                            'file_size' => $file->file_size,
+                            'file_url' => url("storage/" . $file->file_path),
+                        ];
+                    })
+                ];
+            })
+        ]);
+    }
 
 }

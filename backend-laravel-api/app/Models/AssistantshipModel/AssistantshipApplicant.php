@@ -5,10 +5,11 @@ namespace App\Models\AssistantshipModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\User;
+use Illuminate\Notifications\Notifiable;
 
 class AssistantshipApplicant extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $table = 'assistantship_applicants'; 
 

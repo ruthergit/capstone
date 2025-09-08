@@ -6,9 +6,9 @@ import AdminLayout from "./layouts/AdminLayout.tsx";
 import AdminDashboard from "./pages/admin/Dashboard.tsx";
 import Chats from "./pages/admin/Chats.tsx";
 import Departments from "./pages/admin/Departments.tsx";
-import Applicants from "./pages/admin/Applicants.tsx";
 import AdminSchoolEvents from "./pages/admin/SchoolEvents.tsx";
-import AdminStudentSupport from "./pages/admin/StudentSupport.tsx";
+import ScholarshipApplicant from "./pages/admin/ScholarshipApplicant.tsx";
+import AssistantshipApplicant from "./pages/admin/AssistantshipApplicant.tsx";
 
 import StudentLayout from "./layouts/StudentLayout.tsx";
 import StudentDashboard from "./pages/student/Dashboard.tsx";
@@ -41,11 +41,11 @@ const App: React.FC = () => {
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="applicants" element={<Applicants />} />
           <Route path="departments" element={<Departments />} />
-          <Route path="student-support" element={<AdminStudentSupport />} />
           <Route path="school-events" element={<AdminSchoolEvents />} />
           <Route path="chats" element={<Chats />} />
+          <Route path="scholarships/:id" element={<ScholarshipApplicant/>}/>
+          <Route path="assistantships/:id" element={<AssistantshipApplicant/>}/>
         </Route>
       </Route>
 

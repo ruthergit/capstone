@@ -14,6 +14,7 @@ export type Applicant = {
   user_name: string;
   user_email: string;
   pdf_path: string;
+  pdf_url: string;
   original_name: string;
   status: string;
   created_at?: string;
@@ -50,10 +51,20 @@ export const applyScholarship = async (id: number, pdf: File) => {
   return response.data;
 };
 
-export const approveScholarship = async (id: number) => {
-  const response = await api.post(`/scholarships/${id}/approve`);
+export const approveScholarshipApplicant = async (id: number) => {
+  const response = await api.post(`/scholarship-applicants/${id}/approve`);
   return response.data;
 };
+
+export const rejectScholarshipApplicant = async (id: number) => {
+  const response = await api.post(`/scholarship-applicants/${id}/reject`);
+  return response.data;
+};
+
+export const getScholarshipApplications = async (id: number) => {
+  const response = await api.get(`/scholarships/${id}/applicants`);
+  return response.data;
+}
 
 export const getScholarshipApplicant = async () => {
   const response = await api.get<Applicant[]>("/applicants");
@@ -66,6 +77,6 @@ export const getStudentDetails = async () => {
 };
 
 export const getUserScholarshipApplications = async (userId: number) => {
-  const res = await api.get(`/scholarships/${userId}/applicant`)
+  const res = await api.get(`/scholarships/${userId}/scholarship-applications`)
   return res.data.applications;
 };

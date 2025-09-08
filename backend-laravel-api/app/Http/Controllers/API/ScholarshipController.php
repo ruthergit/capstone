@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Notifications\ScholarshipApproved;
 use App\Models\ScholarshipModel\Scholarship;
 use App\Models\ScholarshipModel\ScholarshipApplicant;
 
@@ -20,7 +21,7 @@ class ScholarshipController extends Controller
         
         $file = $request->file('pdf');
         $originalName = $file->getClientOriginalName(); 
-        $path = $request->file('pdf')->store('scholarships', 'public');
+        $path = $file->store('scholarships', 'public'); // ✅ same as apply()
 
         $scholarship = Scholarship::create([
             'name' => $request->name,
@@ -28,19 +29,49 @@ class ScholarshipController extends Controller
             'original_name' => $originalName,
         ]);
 
-        return response()->json($scholarship, 201);
+        return response()->json([
+            'message' => 'Scholarship created successfully',
+            'scholarship' => $scholarship,
+            'preview_url' => url("storage/" . $path), 
+        ], 201);
     }
 
-    public function approve(Request $request, $id)
+
+    public function approve($id)
     {
         try {
-            $applicant = ScholarshipApplicant::findOrFail($id); // ✅ updated model
+            $applicant = ScholarshipApplicant::findOrFail($id);
 
             $applicant->update([
                 'status' => 'approved'
             ]);
 
-            return response()->json(['message' => 'Student scholarship approved']);
+            $scholarshipName = $applicant->scholarship->name ?? 'Scholarship';
+
+            $applicant->user->notify(new ScholarshipApproved($scholarshipName));
+
+            return response()->json([
+                'message' => 'Scholarship approved and user notified.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function reject($id)
+    {
+        try {
+            $applicant = ScholarshipApplicant::findOrFail($id);
+
+            $applicant->update([
+                'status'=> 'rejected'
+            ]);
+
+            return response()->json(['message' => 'Student scholarship rejected']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], status: 500);
         }
@@ -88,6 +119,7 @@ class ScholarshipController extends Controller
         return response()->json([
             'message' => 'Applied successfully',
             'application' => $application,
+            'preview_url' => url("storage/" . $path), // 👈 important
         ]);
     }
 
@@ -106,8 +138,31 @@ class ScholarshipController extends Controller
 
     public function allApplicants()
     {
-        $applicants = ScholarshipApplicant::with(['user', 'scholarship'])->get(); // ✅ updated model
+        $applicants = ScholarshipApplicant::with(['user', 'scholarship'])->get();
+
+        $applicants->transform(function ($applicant) {
+            $applicant->pdf_url = url("storage/" . $applicant->pdf_path);
+            return $applicant;
+        });
 
         return response()->json($applicants);
     }
+    // Get all applicants for a specific scholarship
+    public function scholarshipApplicants($scholarshipId)
+    {
+        $scholarship = Scholarship::with(['scholarshipApplicants.user'])
+            ->findOrFail($scholarshipId);
+
+        $applicants = $scholarship->scholarshipApplicants->map(function ($applicant) {
+            $applicant->pdf_url = url("storage/" . $applicant->pdf_path);
+            return $applicant;
+        });
+
+        return response()->json([
+            'scholarship_id' => $scholarship->id,
+            'scholarship_name' => $scholarship->name,
+            'applicants' => $applicants
+        ]);
+    }
+
 }
