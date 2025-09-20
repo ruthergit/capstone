@@ -18,7 +18,7 @@ class AuthController extends Controller
             'name' => 'required|string',
             'login_id' => 'required|string|unique:users',
             'password' => 'required|string|confirmed',
-            'type' => 'required|in:admin,student,student_org,faculty,org_advisor,dean',
+            'type' => 'required|in:admin,event_admin,cesd_admin,student,student_org,faculty,org_advisor,dean',
 
             // Required only if student_org
             // New validation rules

@@ -43,32 +43,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/{id}/notifications', [NotificationController::class, 'index']);
     Route::post('/user/{id}/notifications/{notificationId}/read', [NotificationController::class, 'markAsRead']);
 
-    // Event creation & viewing
-    Route::get('/events', [EventController::class, 'index']);
-    Route::post('/events', [EventController::class, 'store']);
-    Route::get('/events/{event}', [EventController::class, 'show']);
-
-    // Event approval
-    Route::prefix('events/{event}')->group(function () {
-        // Approve routes
-        Route::post('/advisor', [EventController::class, 'approveByOrgAdvisor']);
-        Route::post('/dean', [EventController::class, 'approveByDean']);
-        Route::post('/admin', [EventController::class, 'approveByAdmin']);
-
-        // Reject routes
-        Route::post('/reject/advisor', [EventController::class, 'rejectedByOrgAdvisor']);
-        Route::post('/reject/dean', [EventController::class, 'rejectedByDean']);
-        Route::post('/reject/admin', [EventController::class, 'rejectedByAdmin']);
-
-        // Revision request
-        Route::post('/revision/advisor', [EventController::class, 'requestRevisionByOrgAdvisor']);
-        Route::post('/revision/dean', [EventController::class, 'requestRevisionByDean']);
-        Route::post('/revision/admin', [EventController::class, 'requestRevisionByAdmin']);
-
-        // Revision routes
-         Route::put('/', [EventController::class, 'update']); // event revision submission
-
-    });
+    Route::get('/events', [EventController::class, 'index']);   // for listing
+    Route::post('/events', [EventController::class, 'store']);  // for creating
+    Route::put('/events/{id}', [EventController::class, 'update']);
+    
+    // For student_org: list only fully approved events
+    Route::get('/events/approved', [EventController::class, 'approvedEvents']);
+    // Approve / Reject / Revision
+    Route::post('/events/{id}/approve', [EventController::class, 'approve']);
+    // List events created by a student org
+    Route::get('/events/my', [EventController::class, 'myEvents']);
+    // List pending approvals for the logged-in user
+    Route::get('/approvals/pending', [EventController::class, 'myPendingApprovals']);
+    // (Optional) View full event details with approvals
+    Route::get('/events/{id}', [EventController::class, 'show']);
+    Route::post('/events/{id}/final-date', [EventController::class, 'setFinalDate']);
+    
 });
 
 

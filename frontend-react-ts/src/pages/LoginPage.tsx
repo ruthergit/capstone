@@ -32,6 +32,12 @@ const LoginPage = () => {
         case "admin":
           navigate("/admin");
           break;
+        case "event_admin":
+          navigate("/event-admin");
+          break;
+        case "cesd_admin":
+          navigate("/cesd_admin");
+          break;
         case "student":
           navigate("/student");
           break;

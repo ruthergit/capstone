@@ -1,7 +1,6 @@
 import header from "../../assets/images/pnc-stuff/pnc-header.png";
 import menu from "../../assets/images/pnc-stuff/menu.png";
 import Dashboard from "../../assets/images/component-img/Dashboard-Icon.svg?react";
-import Document from "../../assets/images/component-img/Document-icon.svg?react";
 import Department from "../../assets/images/component-img/Departments-icon.svg?react";
 import Student from "../../assets/images/component-img/Student-icon.svg?react";
 import Calendar from "../../assets/images/component-img/Calendar-icon.svg?react";
@@ -15,7 +14,6 @@ import { useUserStore } from "../../store/useUserStore";
 import { useState, useEffect, useRef } from "react";
 import {
   getScholarship,
-  getScholarshipApplications,
   type Scholarship,
   addScholarship,
 } from "../../services/scholarship";

@@ -4,12 +4,13 @@ import Dashboard from "../../assets/images/component-img/Dashboard-Icon.svg?reac
 import Calendar from "../../assets/images/component-img/Calendar-icon.svg?react";
 import Drop from "../../assets/images/component-img/Drop-icon.svg?react";
 import Profile from "../../assets/images/component-img/Profile-icon.svg?react";
+import Department from "../../assets/images/component-img/Departments-icon.svg?react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuthTokenStore } from "../../store/useAuthTokenStore";
 import { useUserStore } from "../../store/useUserStore";
 import { useState } from "react";
 
-const AdviserNavbar = () => {
+const AdminNavbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { clearToken } = useAuthTokenStore();
@@ -42,13 +43,19 @@ const AdviserNavbar = () => {
       </div>
       <div className="flex-1">
         <ul className="flex flex-col px-5 py-6 gap-3">
-          <NavLink to="/adviser" end className={linkClass}>
-            <Dashboard className={`w-4.5 ${iconFilter("/adviser")}`} />
+          <NavLink to="/event-admin" end className={linkClass}>
+            <Dashboard className={`w-4.5 ${iconFilter("/event-admin")}`} />
             <p>Dashboard</p>
           </NavLink>
-          <NavLink to="/adviser/school-events" className={linkClass}>
+          <NavLink to="/event-admin/departments" className={linkClass}>
+            <Department
+              className={`w-4.5 ${iconFilter("/event-admin/departments")}`}
+            />
+            <p>Departments</p>
+          </NavLink>
+          <NavLink to="/event-admin/school-events" className={linkClass}>
             <Calendar
-              className={`w-4.5 ${iconFilter("/adviser/school-events")}`}
+              className={`w-4.5 ${iconFilter("/event-admin/school-events")}`}
             />
             <p>School Events</p>
           </NavLink>
@@ -79,4 +86,4 @@ const AdviserNavbar = () => {
   );
 };
 
-export default AdviserNavbar;
+export default AdminNavbar;

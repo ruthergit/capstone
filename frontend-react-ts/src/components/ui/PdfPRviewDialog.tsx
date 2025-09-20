@@ -1,46 +1,66 @@
-import React, { useRef } from "react";
+import React from "react";
+import { X } from "lucide-react";
 
-interface PdfPreviewDialogProps {
+interface FilePreviewDialogProps {
   fileUrl: string | null;
   onClose: () => void;
 }
 
-const PdfPreviewDialog: React.FC<PdfPreviewDialogProps> = ({ fileUrl, onClose }) => {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  
-  React.useEffect(() => {
-    if (fileUrl) {
-      dialogRef.current?.showModal();
-    } else {
-      dialogRef.current?.close();
-    }
-  }, [fileUrl]);
+const FilePreviewDialog: React.FC<FilePreviewDialogProps> = ({ fileUrl, onClose }) => {
+  if (!fileUrl) return null;
+
+  const ext = fileUrl.split(".").pop()?.toLowerCase();
+
+  const isPdf = ext === "pdf";
+  const isImage = ["png", "jpg", "jpeg", "gif"].includes(ext || "");
+  const isOffice = ["doc", "docx", "xls", "xlsx", "ppt", "pptx"].includes(ext || "");
 
   return (
-    <dialog
-      ref={dialogRef}
-      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded p-4 shadow-xl backdrop:bg-black/50 focus:outline-none bg-white w-full max-w-5xl font-nunito"
-    >
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-semibold">PDF Preview</h2>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-lg w-[90%] h-[90%] relative">
         <button
+          className="absolute top-2 right-2 text-gray-700 hover:text-black"
           onClick={onClose}
-          className="px-3 py-1 bg-red-500 text-white rounded"
         >
-          Close
+          <X size={20} />
         </button>
-      </div>
 
-      {fileUrl ? (
-        <iframe
-          src={fileUrl}
-          className="w-full h-[80vh] border rounded"
-        />
-      ) : (
-        <p className="text-gray-600">No file selected</p>
-      )}
-    </dialog>
+        <div className="w-full h-full flex items-center justify-center p-4">
+          {isPdf && (
+            <iframe
+              src={fileUrl}
+              className="w-full h-full rounded"
+              title="PDF Preview"
+            />
+          )}
+
+          {isImage && (
+            <img src={fileUrl} alt="Preview" className="max-h-full max-w-full rounded" />
+          )}
+
+          {isOffice && (
+            <a
+              href={fileUrl}
+              download
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
+            >
+              Download File
+            </a>
+          )}
+
+          {!isPdf && !isImage && !isOffice && (
+            <a
+              href={fileUrl}
+              download
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
+            >
+              Download File
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default PdfPreviewDialog;
+export default FilePreviewDialog;

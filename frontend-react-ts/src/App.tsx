@@ -10,6 +10,16 @@ import AdminSchoolEvents from "./pages/admin/SchoolEvents.tsx";
 import ScholarshipApplicant from "./pages/admin/ScholarshipApplicant.tsx";
 import AssistantshipApplicant from "./pages/admin/AssistantshipApplicant.tsx";
 
+import EventAdminLayout from "./layouts/EventAdminLayout.tsx";
+import EventAdminDashboard from "./pages/event_admin/Dashboard.tsx";
+import EventAdminDepartments from "./pages/event_admin/Departments.tsx";
+import EventAdminSchoolEvents from "./pages/event_admin/SchoolEvents.tsx";
+
+import CesdAdminLayout from "./layouts/CesdAdminLayout.tsx";
+import CesdAdminDashboard from "./pages/cesd_admin/Dashboard.tsx";
+import CesdAdminDepartments from "./pages/cesd_admin/Departments.tsx";
+import CesdAdminSchoolEvents from "./pages/cesd_admin/SchoolEvents.tsx";
+
 import StudentLayout from "./layouts/StudentLayout.tsx";
 import StudentDashboard from "./pages/student/Dashboard.tsx";
 import StudentSupport from "./pages/student/StudentSupport.tsx";
@@ -46,6 +56,22 @@ const App: React.FC = () => {
           <Route path="chats" element={<Chats />} />
           <Route path="scholarships/:id" element={<ScholarshipApplicant/>}/>
           <Route path="assistantships/:id" element={<AssistantshipApplicant/>}/>
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={["event_admin"]} />}>
+        <Route path="/event-admin" element={<EventAdminLayout/>}>
+          <Route index element={<EventAdminDashboard />} />
+          <Route path="departments" element={<EventAdminDepartments/>}/>
+          <Route path="school-events" element={<EventAdminSchoolEvents/>}/>
+        </Route>
+      </Route>
+
+      <Route element={<ProtectedRoute allowedRoles={["cesd_admin"]} />}>
+        <Route path="/cesd-admin" element={<CesdAdminLayout/>}>
+          <Route index element={<CesdAdminDashboard />} />
+          <Route path="departments" element={<CesdAdminDepartments/>}/>
+          <Route path="school-events" element={<CesdAdminSchoolEvents/>}/>
         </Route>
       </Route>
 
