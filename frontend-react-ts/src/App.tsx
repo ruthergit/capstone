@@ -51,7 +51,7 @@ const App: React.FC = () => {
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="departments" element={<Departments />} />
+          <Route path="organizations" element={<Departments />} />
           <Route path="school-events" element={<AdminSchoolEvents />} />
           <Route path="chats" element={<Chats />} />
           <Route path="scholarships/:id" element={<ScholarshipApplicant/>}/>
@@ -62,7 +62,7 @@ const App: React.FC = () => {
       <Route element={<ProtectedRoute allowedRoles={["event_admin"]} />}>
         <Route path="/event-admin" element={<EventAdminLayout/>}>
           <Route index element={<EventAdminDashboard />} />
-          <Route path="departments" element={<EventAdminDepartments/>}/>
+          <Route path="organizations" element={<EventAdminDepartments/>}/>
           <Route path="school-events" element={<EventAdminSchoolEvents/>}/>
         </Route>
       </Route>
@@ -70,7 +70,7 @@ const App: React.FC = () => {
       <Route element={<ProtectedRoute allowedRoles={["cesd_admin"]} />}>
         <Route path="/cesd-admin" element={<CesdAdminLayout/>}>
           <Route index element={<CesdAdminDashboard />} />
-          <Route path="departments" element={<CesdAdminDepartments/>}/>
+          <Route path="organizations" element={<CesdAdminDepartments/>}/>
           <Route path="school-events" element={<CesdAdminSchoolEvents/>}/>
         </Route>
       </Route>

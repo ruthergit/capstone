@@ -55,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/events/my', [EventController::class, 'myEvents']);
     // List pending approvals for the logged-in user
     Route::get('/approvals/pending', [EventController::class, 'myPendingApprovals']);
+    Route::get('/approvals/history', [EventController::class, 'myApprovalHistory']);
     // (Optional) View full event details with approvals
     Route::get('/events/{id}', [EventController::class, 'show']);
     Route::post('/events/{id}/final-date', [EventController::class, 'setFinalDate']);

@@ -140,11 +140,11 @@ const AdminNavbar = () => {
             <Dashboard className={`w-4.5 ${iconFilter("/admin")}`} />
             <p>Dashboard</p>
           </NavLink>
-          <NavLink to="/admin/departments" className={linkClass}>
+          <NavLink to="/admin/organizations" className={linkClass}>
             <Department
-              className={`w-4.5 ${iconFilter("/admin/departments")}`}
+              className={`w-4.5 ${iconFilter("/admin/organizations")}`}
             />
-            <p>Departments</p>
+            <p>Organizations</p>
           </NavLink>
 
           <NavLink to="/admin/school-events" className={linkClass}>

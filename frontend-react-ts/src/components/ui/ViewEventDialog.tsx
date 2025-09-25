@@ -16,12 +16,12 @@ interface Props {
 const ViewEventDialog = ({ event, isOpen, onClose, onEventUpdated }: Props) => {
   const [selectedFileUrl, setSelectedFileUrl] = useState<string | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  // ✅ Add local state to ensure we have the latest event data
+
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
 
   const backendUrl = "http://127.0.0.1:8000";
 
-  // ✅ Update local state when event prop changes
+
   useEffect(() => {
     if (event) {
       setCurrentEvent(event);
@@ -65,14 +65,11 @@ const ViewEventDialog = ({ event, isOpen, onClose, onEventUpdated }: Props) => {
   };
 
   const handleEventUpdated = (updatedEvent: Event) => {
-    // ✅ Update both local state and notify parent
     setCurrentEvent(updatedEvent);
     onEventUpdated(updatedEvent);
     setIsEditDialogOpen(false);
-    // Don't close the view dialog immediately - let user see the updated data
   };
 
-  // ✅ Use currentEvent instead of event prop directly
   if (!currentEvent) return null;
 
   return (

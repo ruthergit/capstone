@@ -188,14 +188,12 @@ class EventController extends Controller
         ]);
     }
 
-
-
     public function approve(Request $request, $id)
     {
         Log::info('Approve called', [
             'event_id'      => $id,
             'auth_user_id'  => Auth::id(),
-            'request_input' => $request->all(), // ✅ log all incoming data
+            'request_input' => $request->all(),
         ]);
 
         try {
@@ -310,11 +308,22 @@ class EventController extends Controller
     {
         $approvals = EventApproval::where('user_id', Auth::id())
             ->where('status', 'pending')
-            ->with(['event.studentOrg', 'event.files'])
+            ->with(['event.studentOrg', 'event.files', 'event.approvals.approver'])
             ->get();
 
         return response()->json($approvals);
     }
+    public function myApprovalHistory()
+    {
+        $approvals = EventApproval::where('user_id', Auth::id())
+            ->where('status', '!=', 'pending') 
+            ->with(['event.studentOrg', 'event.files', 'event.approvals.approver'])
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return response()->json($approvals);
+    }
+
     // Show event with full approval trail
     public function show($id)
     {
@@ -325,10 +334,8 @@ class EventController extends Controller
     }
     public function approvedEvents()
     {
-        $user = Auth::user();
-
         $events = Event::where('status', 'approved')
-            ->with(['approvals.approver', 'files'])
+            ->with(['studentOrg', 'approvals.approver', 'files'])
             ->orderBy('proposed_date', 'asc') // sort by date so they can check availability
             ->get();
 

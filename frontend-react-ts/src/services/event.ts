@@ -22,11 +22,16 @@ export interface Event {
   location?: string | null;
   proposed_date: string;
   optional_date?: string | null;
-  final_date?: string | null;
+  final_date: string | null;
   status?: string;
   files?: EventFile[];
   approvals?: any[];
-  studentOrg?: any;
+  student_org?: {
+    id: number;
+    name: string;
+    login_id: string;
+    type: string;
+  };
 }
 
 // ---------------------------
@@ -82,7 +87,10 @@ export const getMyPendingApprovals = async () => {
   const res = await api.get("/approvals/pending");
   return res.data;
 };
-
+export const getMyApprovalHistory = async () => {
+  const res = await api.get("/approvals/history");
+  return res.data;
+}
 // View full event details with approvals
 export const getEventDetails = async (id: number) => {
   const res = await api.get<Event>(`/events/${id}`);

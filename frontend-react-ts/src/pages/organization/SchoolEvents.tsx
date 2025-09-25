@@ -9,6 +9,7 @@ import { useRef, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import DraggableCarousel from "../../components/DraggableCarousel";
 import AddEventDialog from "../../components/ui/AddEventDialog";
+import CalendarDialog from "../../components/ui/CalendarDialog";
 
 const SchoolEvents = () => {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -147,7 +148,10 @@ const SchoolEvents = () => {
 
           {/* Approved Events */}
           <div className="bg-white shadow-md rounded h-1/2 p-6 overflow-hidden">
-            <h1>Approved Events</h1>
+            <div className="mb-3 flex justify-between">
+              <h1 className="font-semibold ">Approved Events</h1>
+              <CalendarDialog showApprovals={false} showFiles={false} />
+            </div>
           </div>
         </div>
       </div>
